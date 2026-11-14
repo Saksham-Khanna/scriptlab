@@ -1,53 +1,63 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
 
 export async function GET() {
   try {
-    const dbPath = path.resolve(process.cwd(), "backend/data/db.json");
-    let courses = [];
-    let assignments = [];
-    if (fs.existsSync(dbPath)) {
-      const db = JSON.parse(fs.readFileSync(dbPath, "utf-8"));
-      courses = db.courses || [];
-      assignments = db.assignments || [];
-    }
-
-    const enrolledCourses = courses.map((c: any) => ({
-      id: c.id,
-      title: c.title,
-      slug: c.slug,
-      tagline: c.tagline,
-      description: c.description,
-      level: c.level,
-      durationWeeks: c.durationWeeks,
-      coverImage: c.coverImage,
-      outcomes: c.outcomes,
-      isPublished: c.isPublished,
-      isFeatured: c.isFeatured,
-      categoryId: c.categoryId,
-      categoryName: "Commercial Screenwriting",
-      categorySlug: "commercial-screenwriting",
-      instructorId: c.instructorId,
-      instructorName: "Sarah Jenkins",
-      createdAt: c.createdAt,
-      enrollmentCount: 2,
-      progress: { total: 3, completed: 1, percent: 33 },
-    }));
+    const enrolledCourses = [
+      {
+        id: 1,
+        title: "The Commercial Spec: Writing Screenplays That Sell",
+        slug: "the-commercial-spec-writing-screenplays-that-sell",
+        tagline: "Learn how produced writers turn an idea into a marketable feature spec.",
+        description: "Most first screenplays fail not because the writer lacks talent...",
+        level: "beginner",
+        durationWeeks: 6,
+        coverImage: "/images/course-commercial.svg",
+        outcomes: ["Evaluate premise", "Write logline", "Understand coverage"],
+        isPublished: true,
+        isFeatured: true,
+        categoryId: 1,
+        categoryName: "Commercial Screenwriting",
+        categorySlug: "commercial-screenwriting",
+        instructorId: 2,
+        instructorName: "Sarah Jenkins",
+        createdAt: new Date().toISOString(),
+        enrollmentCount: 2,
+        progress: { total: 3, completed: 1, percent: 33 },
+      },
+      {
+        id: 2,
+        title: "Advanced TV Showrunner Masterclass",
+        slug: "advanced-tv-showrunner-masterclass",
+        tagline: "Master pilot structure, series bibles, and running a writers' room.",
+        description: "Television is a writer's medium...",
+        level: "advanced",
+        durationWeeks: 8,
+        coverImage: "/images/course-tv.svg",
+        outcomes: ["Architect pilot", "Write series bible"],
+        isPublished: true,
+        isFeatured: true,
+        categoryId: 6,
+        categoryName: "Writers' Room Collaboration",
+        categorySlug: "writers-room-collaboration",
+        instructorId: 2,
+        instructorName: "Sarah Jenkins",
+        createdAt: new Date().toISOString(),
+        enrollmentCount: 1,
+        progress: { total: 2, completed: 0, percent: 0 },
+      }
+    ];
 
     const data = {
       enrolledCourses,
-      overall: { total: 7, completed: 2, percent: 29 },
+      overall: { total: 5, completed: 1, percent: 20 },
       recentLessons: [
         { lessonId: 1, title: "What 'Commercial' Actually Means", courseTitle: "The Commercial Spec: Writing Screenplays That Sell", lastAccessedAt: new Date().toISOString(), completed: true },
         { lessonId: 2, title: "Coverage Walkthrough: Anatomy of a Pass", courseTitle: "The Commercial Spec: Writing Screenplays That Sell", lastAccessedAt: new Date().toISOString(), completed: false },
       ],
-      pendingAssignments: assignments.map((a: any) => ({
-        id: a.id,
-        title: a.title,
-        courseTitle: "The Commercial Spec: Writing Screenplays That Sell",
-        dueDate: a.dueDate,
-      })),
+      pendingAssignments: [
+        { id: 1, title: "Logline & Irony Analysis", courseTitle: "The Commercial Spec: Writing Screenplays That Sell", dueDate: new Date(Date.now() + 7 * 86400000).toISOString() },
+        { id: 2, title: "First 10 Pages Spec Opening", courseTitle: "The Commercial Spec: Writing Screenplays That Sell", dueDate: new Date(Date.now() + 14 * 86400000).toISOString() },
+      ],
       recentFeedback: [
         {
           submissionId: 1,

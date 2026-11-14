@@ -88,7 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await api("/auth/logout", { method: "POST" }).catch(() => null);
     await new Promise((resolve) => setTimeout(resolve, 1500)); // 1.5s smooth loading spinner
     if (typeof window !== "undefined") {
-      window.location.href = "/login";
+      window.location.href = "/";
     }
   };
 

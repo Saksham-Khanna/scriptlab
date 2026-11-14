@@ -134,3 +134,7 @@ export function Stat({ label, value, sub }: { label: string; value: ReactNode; s
     </div>
   );
 }
+
+export function Divider({ className = "" }: { className?: string }) {
+  return <hr className={`my-6 border-t border-line ${className}`} />;
+}

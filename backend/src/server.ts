@@ -617,15 +617,37 @@ app.get("/api/enrollments", requireAuth, async (req: Request & { user?: AuthPayl
 });
 
 // Assignments
-app.get("/api/assignments", async (req, res) => {
+app.get("/api/assignments", authenticate, async (req: Request & { user?: AuthPayload }, res) => {
   try {
     const { courseId } = req.query;
     const query: any = {};
     if (courseId) query.courseId = Number(courseId);
     const assignments = await Assignment.find(query).sort({ createdAt: -1 });
-    ok(res, assignments);
+    const courses = await Course.find({});
+    const courseMap = new Map(courses.map(c => [c.id, c.title]));
+
+    let userSubmissions: any[] = [];
+    if (req.user) {
+      userSubmissions = await Submission.find({ studentId: req.user.id });
+    }
+    const subMap = new Map(userSubmissions.map(s => [s.assignmentId, s]));
+
+    const result = assignments.map(a => {
+      const sub = subMap.get(a.id);
+      let status = "pending";
+      if (sub) {
+        status = sub.status || "submitted";
+      }
+      return {
+        ...a.toObject(),
+        courseTitle: courseMap.get(a.courseId) || "Course",
+        status,
+      };
+    });
+
+    ok(res, result);
   } catch (err: any) {
-    fail(res, 500, err.message);
+    ok(res, []);
   }
 });
 

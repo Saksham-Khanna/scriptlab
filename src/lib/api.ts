@@ -17,28 +17,55 @@ export const tokenStore = {
 };
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
+const apiCache = new Map<string, { data: unknown; expiry: number }>();
+const CACHE_TTL = 30000; // 30 seconds
 
 export async function api<T = unknown>(path: string, init: RequestInit & { json?: unknown } = {}): Promise<T> {
+  const method = (init.method || "GET").toUpperCase();
+  const isGet = method === "GET";
+  const url = path.startsWith("http") ? path : `${API_BASE}${path.startsWith("/") ? path : `/${path}`}`;
+
+  if (isGet) {
+    const cached = apiCache.get(url);
+    if (cached && cached.expiry > Date.now()) {
+      return cached.data as T;
+    }
+  }
+
   const headers: Record<string, string> = { ...(init.headers as Record<string, string>) };
   if (init.json !== undefined) headers["Content-Type"] = "application/json";
   const token = tokenStore.get();
   if (token) headers["Authorization"] = `Bearer ${token}`;
-  const url = path.startsWith("http") ? path : `${API_BASE}${path.startsWith("/") ? path : `/${path}`}`;
+
   const res = await fetch(url, {
     ...init,
+    method,
     headers,
     body: init.json !== undefined ? JSON.stringify(init.json) : init.body,
     credentials: "include",
     cache: "no-store",
   });
+
   let payload: { success: boolean; data?: T; error?: string } | null = null;
   try {
     payload = await res.json();
   } catch {
     /* no body */
   }
+
   if (!res.ok || !payload?.success) {
+    if (isGet) {
+      const cached = apiCache.get(url);
+      if (cached) return cached.data as T;
+    }
     throw new ApiClientError(res.status, payload?.error ?? `Request failed (${res.status})`);
   }
+
+  if (isGet) {
+    apiCache.set(url, { data: payload.data, expiry: Date.now() + CACHE_TTL });
+  } else {
+    apiCache.clear();
+  }
+
   return payload.data as T;
 }

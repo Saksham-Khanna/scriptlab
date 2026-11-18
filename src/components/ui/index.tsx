@@ -1,5 +1,7 @@
+"use client";
+
 import Link from "next/link";
-import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from "react";
+import { useState, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from "react";
 
 const base = "inline-flex items-center justify-center gap-2 rounded-md font-medium transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/60";
 const variants = {
@@ -21,8 +23,14 @@ export function Button({ variant = "primary", size = "md", loading, className = 
 }
 
 export function ButtonLink({ href, variant = "primary", size = "md", className = "", children }: { href: string; variant?: keyof typeof variants; size?: keyof typeof sizes; className?: string; children: ReactNode }) {
+  const [loading, setLoading] = useState(false);
   return (
-    <Link href={href} className={`${base} ${variants[variant]} ${sizes[size]} ${className}`}>
+    <Link
+      href={href}
+      onClick={() => setLoading(true)}
+      className={`${base} ${variants[variant]} ${sizes[size]} ${className} ${loading ? "pointer-events-none opacity-80" : ""}`}
+    >
+      {loading && <Spinner className="h-4 w-4" />}
       {children}
     </Link>
   );

@@ -3,6 +3,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { ButtonLink } from "@/components/ui";
 import { FeaturedPrograms } from "@/components/landing/FeaturedPrograms";
+import { HeroActions } from "@/components/landing/HeroActions";
 
 const STEPS = [
   { n: "01", title: "Choose a program", body: "Nine tracks spanning commercial specs, structure, character, dialogue, story breaking, writers' rooms, table reads, script doctoring and rewrites." },
@@ -42,10 +43,7 @@ export default function Home() {
             <p className="animate-rise delay-2 mt-6 max-w-xl text-lg leading-relaxed text-parchment">
               ScriptLab is a structured, mentor-led program for aspiring screenwriters. Learn how produced writers break story, build characters, write scenes that turn — and diagnose the draft that isn&apos;t working.
             </p>
-            <div className="animate-rise delay-3 mt-9 flex flex-wrap gap-3">
-              <ButtonLink href="/register" size="lg">Join the Lab</ButtonLink>
-              <ButtonLink href="/courses" variant="secondary" size="lg">Explore programs</ButtonLink>
-            </div>
+            <HeroActions />
             <div className="animate-rise delay-3 mt-14 flex flex-wrap gap-x-10 gap-y-4 text-sm text-muted">
               <span><strong className="font-display text-2xl text-ivory">9</strong> &nbsp;craft tracks</span>
               <span><strong className="font-display text-2xl text-ivory">40+</strong> &nbsp;lessons</span>

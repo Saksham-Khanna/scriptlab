@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import { useAuth, type Role } from "@/components/providers/AuthProvider";
 import { Logo } from "./Navbar";
-import { PageLoader } from "@/components/ui";
+import { PageLoader, Spinner } from "@/components/ui";
 import { roleHome } from "@/lib/format";
 
 const NAV: Record<Role, { href: string; label: string }[]> = {
@@ -35,6 +35,7 @@ export function AppShell({ children, roles, title }: { children: ReactNode; role
   const router = useRouter();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
 
   useEffect(() => {
     if (loading) return;
@@ -73,7 +74,19 @@ export function AppShell({ children, roles, title }: { children: ReactNode; role
             <p className="text-[11px] uppercase tracking-wider text-muted">{roleLabel}</p>
           </div>
         </div>
-        <button onClick={() => logout()} className="mt-3 w-full rounded-md border border-line py-1.5 text-xs text-parchment transition hover:border-gold/40 hover:text-ivory">
+        <button
+          disabled={signingOut}
+          onClick={async () => {
+            setSigningOut(true);
+            try {
+              await logout();
+            } finally {
+              setSigningOut(false);
+            }
+          }}
+          className="mt-3 flex w-full items-center justify-center gap-2 rounded-md border border-line py-1.5 text-xs text-parchment transition hover:border-gold/40 hover:text-ivory disabled:opacity-50"
+        >
+          {signingOut && <Spinner className="h-3.5 w-3.5" />}
           Sign out
         </button>
       </div>

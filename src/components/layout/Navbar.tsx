@@ -22,6 +22,7 @@ export function Navbar() {
   const { user, loading, logout } = useAuth();
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   const links = [
     { href: "/courses", label: "Programs" },
@@ -46,7 +47,15 @@ export function Navbar() {
               <ButtonLink href={roleHome[user.role]} variant="secondary" size="sm">
                 {user.role === "student" ? "My dashboard" : user.role === "instructor" ? "Mentor studio" : "Admin"}
               </ButtonLink>
-              <Button variant="ghost" size="sm" onClick={async () => { await logout(); router.push("/"); }}>
+              <Button variant="ghost" size="sm" loading={loggingOut} onClick={async () => {
+                setLoggingOut(true);
+                try {
+                  await logout();
+                  router.push("/");
+                } finally {
+                  setLoggingOut(false);
+                }
+              }}>
                 Sign out
               </Button>
             </>
@@ -71,7 +80,16 @@ export function Navbar() {
               {user ? (
                 <>
                   <ButtonLink href={roleHome[user.role]} size="sm">Dashboard</ButtonLink>
-                  <Button variant="secondary" size="sm" onClick={async () => { await logout(); setOpen(false); router.push("/"); }}>Sign out</Button>
+                  <Button variant="secondary" size="sm" loading={loggingOut} onClick={async () => {
+                    setLoggingOut(true);
+                    try {
+                      await logout();
+                      setOpen(false);
+                      router.push("/");
+                    } finally {
+                      setLoggingOut(false);
+                    }
+                  }}>Sign out</Button>
                 </>
               ) : (
                 <>
